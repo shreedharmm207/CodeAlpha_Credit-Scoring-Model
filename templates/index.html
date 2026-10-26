@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Scoring Model</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="brand">
+                <div class="brand-logo">CS</div>
+                <div class="brand-text">
+                    <span class="brand-title">Credit Scoring Model</span>
+                    <span class="brand-subtitle">Creditworthiness Prediction</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#predictor" class="nav-link active">Credit Predictor</a>
+                <a href="#models" class="nav-link">Model Performance</a>
+                <a href="#methodology" class="nav-link">Methodology</a>
+            </nav>
+            <div class="nav-status">
+                <span class="status-indicator"></span>
+                <span>Active</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Credit Scoring Model</h1>
+                <p>Predict an individual's creditworthiness using past financial data with Logistic Regression, Decision
+                    Tree, and Random Forest classification algorithms.</p>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <span class="stat-value">3</span>
+                    <span class="stat-label">Models</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">11</span>
+                    <span class="stat-label">Features</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">300-850</span>
+                    <span class="stat-label">Score Scale</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">94.2%</span>
+                    <span class="stat-label">Top Accuracy</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="predictor" class="workspace-section">
+            <div class="section-header">
+                <h2>Applicant Credit Assessment</h2>
+                <p>Enter applicant financial data or select a sample profile to predict creditworthiness.</p>
+            </div>
+
+            <div class="quick-samples-bar">
+                <span class="sample-title">Test Profiles:</span>
+                <button type="button" class="btn-sample" onclick="loadSample('prime')">Good Credit Profile</button>
+                <button type="button" class="btn-sample" onclick="loadSample('moderate')">Average Credit
+                    Profile</button>
+                <button type="button" class="btn-sample" onclick="loadSample('high_risk')">High Risk Profile</button>
+            </div>
+
+            <div class="grid-layout">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3>Applicant Financial History</h3>
+                        <span class="step-tag">Input Data</span>
+                    </div>
+
+                    <form id="prediction-form" onsubmit="handleFormSubmit(event)">
+                        <div class="form-group-title">1. Demographics & Income</div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="age">Age</label>
+                                <input type="number" id="age" name="age" min="18" max="99" value="34" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="annual_income">Annual Income ($)</label>
+                                <input type="number" id="annual_income" name="annual_income" min="5000" max="1000000"
+                                    step="500" value="65000" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group-title">2. Loan Request</div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="loan_amount">Loan Amount ($)</label>
+                                <input type="number" id="loan_amount" name="loan_amount" min="500" max="500000"
+                                    step="500" value="12000" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="loan_term_months">Term</label>
+                                <select id="loan_term_months" name="loan_term_months" required>
+                                    <option value="12">12 Months</option>
+                                    <option value="24">24 Months</option>
+                                    <option value="36" selected>36 Months</option>
+                                    <option value="48">48 Months</option>
+                                    <option value="60">60 Months</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group-title">3. Debt & Credit History</div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="total_debt">Total Debt ($)</label>
+                                <input type="number" id="total_debt" name="total_debt" min="0" max="1000000" step="500"
+                                    value="15000" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="credit_history_years">Credit History (Years)</label>
+                                <input type="number" id="credit_history_years" name="credit_history_years" min="0.5"
+                                    max="50" step="0.5" value="8.0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row three-col">
+                            <div class="form-field">
+                                <label for="num_open_accounts">Open Accounts</label>
+                                <input type="number" id="num_open_accounts" name="num_open_accounts" min="0" max="50"
+                                    value="5" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="num_late_payments">Late Payments</label>
+                                <input type="number" id="num_late_payments" name="num_late_payments" min="0" max="30"
+                                    value="0" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="credit_utilization_ratio">Credit Utilization</label>
+                                <div class="slider-container">
+                                    <input type="range" id="credit_utilization_ratio" name="credit_utilization_ratio"
+                                        min="0.01" max="1.0" step="0.01" value="0.25"
+                                        oninput="updateUtilizationDisplay(this.value)">
+                                    <span id="utilization-val" class="slider-val">25%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-title">4. Algorithm</div>
+                        <div class="model-picker">
+                            <label class="model-option">
+                                <input type="radio" name="model_choice" value="Random Forest" checked>
+                                <div class="option-box">
+                                    <span class="option-title">Random Forest</span>
+                                    <span class="option-desc">Classifier</span>
+                                </div>
+                            </label>
+                            <label class="model-option">
+                                <input type="radio" name="model_choice" value="Logistic Regression">
+                                <div class="option-box">
+                                    <span class="option-title">Logistic Regression</span>
+                                    <span class="option-desc">Classifier</span>
+                                </div>
+                            </label>
+                            <label class="model-option">
+                                <input type="radio" name="model_choice" value="Decision Tree">
+                                <div class="option-box">
+                                    <span class="option-title">Decision Tree</span>
+                                    <span class="option-desc">Classifier</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" id="submit-btn" class="btn btn-primary">
+                                <span class="btn-text">Predict Creditworthiness</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card result-card" id="results-panel">
+                    <div class="card-header">
+                        <h3>Assessment Results</h3>
+                        <span id="result-status-badge" class="result-badge badge-pending">Waiting for Input</span>
+                    </div>
+
+                    <div id="empty-state" class="empty-state-view">
+                        <div class="empty-icon">&#128202;</div>
+                        <h4>No Prediction Generated Yet</h4>
+                        <p>Fill out the applicant details on the left or select a test profile, then click
+                            <strong>Predict Creditworthiness</strong>.</p>
+                    </div>
+
+                    <div id="active-results" class="active-results-view" style="display: none;">
+                        <div class="score-display-wrapper">
+                            <div class="score-circle">
+                                <svg class="progress-ring" width="160" height="160">
+                                    <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="12"
+                                        fill="transparent" r="68" cx="80" cy="80" />
+                                    <circle id="score-ring" class="progress-ring-fill" stroke="#2563eb"
+                                        stroke-width="12" stroke-dasharray="427.25" stroke-dashoffset="427.25"
+                                        stroke-linecap="round" fill="transparent" r="68" cx="80" cy="80" />
+                                </svg>
+                                <div class="score-text-inner">
+                                    <span id="score-number" class="score-number">745</span>
+                                    <span class="score-max">/ 850</span>
+                                </div>
+                            </div>
+                            <div class="score-details">
+                                <div class="decision-title-row">
+                                    <span id="decision-text" class="decision-text">Approved</span>
+                                    <span id="rating-text" class="rating-text">Tier: Good</span>
+                                </div>
+                                <p id="decision-summary" class="decision-summary">Applicant has a good credit profile
+                                    with low risk of default.</p>
+                                <div class="metric-tags">
+                                    <div class="tag-box">
+                                        <span class="tag-title">Model</span>
+                                        <span id="res-model-used" class="tag-data">Random Forest</span>
+                                    </div>
+                                    <div class="tag-box">
+                                        <span class="tag-title">Probability</span>
+                                        <span id="res-probability" class="tag-data">89.4%</span>
+                                    </div>
+                                    <div class="tag-box">
+                                        <span class="tag-title">Default Risk</span>
+                                        <span id="res-default-risk" class="tag-data">10.6%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ratios-bar">
+                            <div class="ratio-box">
+                                <span class="ratio-label">Debt-to-Income (DTI)</span>
+                                <span id="res-dti" class="ratio-val">23.1%</span>
+                                <div class="mini-bar-track">
+                                    <div id="dti-bar-fill" class="mini-bar-fill" style="width: 23%;"></div>
+                                </div>
+                            </div>
+                            <div class="ratio-box">
+                                <span class="ratio-label">Loan-to-Income (LTI)</span>
+                                <span id="res-lti" class="ratio-val">18.5%</span>
+                                <div class="mini-bar-track">
+                                    <div id="lti-bar-fill" class="mini-bar-fill" style="width: 18%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="factors-section">
+                            <div class="factor-column">
+                                <h4 class="factor-heading positive-heading">&#10003; Positive Factors</h4>
+                                <ul id="positive-factors-list" class="factor-list">
+                                    <li>Clean payment history</li>
+                                </ul>
+                            </div>
+                            <div class="factor-column">
+                                <h4 class="factor-heading risk-heading">&#9888; Risk Factors</h4>
+                                <ul id="risk-factors-list" class="factor-list">
+                                    <li>No major risks identified</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="models-section">
+            <div class="section-header">
+                <h2>Model Accuracy Assessment</h2>
+                <p>Model accuracy assessment using metrics like Precision, Recall, F1-Score, and ROC-AUC.</p>
+            </div>
+
+            <div class="table-card card">
+                <div class="table-responsive">
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>ROC-AUC</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="metrics-table-body">
+                            <tr>
+                                <td colspan="7" class="loading-cell">Loading model metrics...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>Metric Comparison</h3>
+                        <span class="step-tag">Test Data</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="metricsChart" width="600" height="300"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-color" style="background:#2563eb;"></span>
+                            Precision</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#10b981;"></span>
+                            Recall</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#f59e0b;"></span>
+                            F1-Score</span>
+                        <span class="legend-item"><span class="legend-color" style="background:#8b5cf6;"></span>
+                            ROC-AUC</span>
+                    </div>
+                </div>
+
+                <div class="card matrix-card">
+                    <div class="card-header">
+                        <h3>Confusion Matrix</h3>
+                        <div class="matrix-select-wrap">
+                            <select id="matrix-model-selector" onchange="renderActiveConfusionMatrix()">
+                                <option value="Logistic Regression">Logistic Regression</option>
+                                <option value="Decision Tree">Decision Tree</option>
+                                <option value="Random Forest" selected>Random Forest</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="matrix-display-container">
+                        <div class="matrix-layout">
+                            <div class="matrix-corner"></div>
+                            <div class="matrix-col-header">Predicted Default (0)</div>
+                            <div class="matrix-col-header">Predicted Creditworthy (1)</div>
+
+                            <div class="matrix-row-header">Actual Default (0)</div>
+                            <div class="matrix-cell tn-cell" id="cm-tn">
+                                <span class="cm-val" id="tn-count">0</span>
+                                <span class="cm-type">True Negative</span>
+                            </div>
+                            <div class="matrix-cell fp-cell" id="cm-fp">
+                                <span class="cm-val" id="fp-count">0</span>
+                                <span class="cm-type">False Positive</span>
+                            </div>
+
+                            <div class="matrix-row-header">Actual Creditworthy (1)</div>
+                            <div class="matrix-cell fn-cell" id="cm-fn">
+                                <span class="cm-val" id="fn-count">0</span>
+                                <span class="cm-type">False Negative</span>
+                            </div>
+                            <div class="matrix-cell tp-cell" id="cm-tp">
+                                <span class="cm-val" id="tp-count">0</span>
+                                <span class="cm-type">True Positive</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="matrix-footer-stats">
+                        <div class="matrix-mini-stat">
+                            <span>False Positive Rate:</span>
+                            <strong id="cm-fpr">0.0%</strong>
+                        </div>
+                        <div class="matrix-mini-stat">
+                            <span>False Negative Rate:</span>
+                            <strong id="cm-fnr">0.0%</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="methodology" class="methodology-section">
+            <div class="section-header">
+                <h2>Feature Engineering & Workflow</h2>
+                <p>Workflow of how data is processed, trained, and evaluated.</p>
+            </div>
+
+            <div class="methodology-grid">
+                <div class="method-card">
+                    <div class="method-icon">01</div>
+                    <h4>Financial Dataset</h4>
+                    <p>Includes past financial history: income, total debts, open accounts, payment history, and loan
+                        requests.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-icon">02</div>
+                    <h4>Feature Engineering</h4>
+                    <p>Calculates key financial ratios including Debt-to-Income (DTI), Loan-to-Income (LTI), and credit
+                        utilization.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-icon">03</div>
+                    <h4>Model Training</h4>
+                    <p>Trains classification algorithms: Logistic Regression, Decision Tree, and Random Forest.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-icon">04</div>
+                    <h4>Credit Scoring</h4>
+                    <p>Maps model prediction probability to a standard 300 to 850 credit score with approval decisions.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="brand-title">Credit Scoring Model</div>
+                <p>Credit Scoring Classification System</p>
+            </div>
+            <div class="footer-col text-right">
+                <p>Algorithms: Logistic Regression | Decision Tree | Random Forest</p>
+                <p>Evaluation: Precision, Recall, F1-Score, ROC-AUC</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/script.js"></script>
+</body>
+
+</html>

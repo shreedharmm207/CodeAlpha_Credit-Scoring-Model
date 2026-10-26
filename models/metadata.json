@@ -1,0 +1,17 @@
+{
+    "feature_names": [
+        "age",
+        "annual_income",
+        "loan_amount",
+        "loan_term_months",
+        "credit_history_years",
+        "num_open_accounts",
+        "num_late_payments",
+        "credit_utilization_ratio",
+        "total_debt",
+        "debt_to_income",
+        "loan_to_income"
+    ],
+    "dataset_size": 2500,
+    "positive_ratio": 0.65
+}
